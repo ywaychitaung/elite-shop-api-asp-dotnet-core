@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/elite-shop.props" />
+</Project>
