@@ -16,3 +16,6 @@ obj/
 
 # Publish files to ignore
 Publish/
+
+# appsettings.json
+appsettings.json
