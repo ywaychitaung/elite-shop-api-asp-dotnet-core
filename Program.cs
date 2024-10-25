@@ -1,9 +1,7 @@
 using System.Text;
 using elite_shop.Data;
 using elite_shop.Helpers;
-using elite_shop.Models.Domains;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
