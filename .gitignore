@@ -1,0 +1,18 @@
+# macOS
+.DS_Store
+
+# idea
+.idea
+
+# Visual Studio files
+.vs
+
+# VS Code files
+.vscode
+
+# Debug files
+bin/
+obj/
+
+# Publish files to ignore
+Publish/

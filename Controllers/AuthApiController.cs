@@ -7,7 +7,7 @@ using elite_shop.Models.DTOs.Requests;
 using Microsoft.EntityFrameworkCore;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/auth")]
 public class AuthApiController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
@@ -21,7 +21,7 @@ public class AuthApiController : ControllerBase
         _encryptionHelper = encryptionHelper;
     }
 
-    [HttpPost("register")]
+    [HttpPost("customers/register")]
     public async Task<IActionResult> Register([FromBody] UserDto userDto)
     {
         if (!ModelState.IsValid)
