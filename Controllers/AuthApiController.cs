@@ -1,9 +1,8 @@
-using elite_shop.Exceptions;
-
 namespace elite_shop.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using elite_shop.Exceptions;
 using elite_shop.Models.DTOs.Requests;
 using elite_shop.Services.Interfaces;
 using System;
@@ -20,7 +19,7 @@ public class AuthApiController : ControllerBase
     }
 
     [HttpPost("customers/register")]
-    public async Task<IActionResult> RegisterCustomer([FromBody] UserDto userDto)
+    public async Task<IActionResult> RegisterCustomer([FromBody] CustomerRegisterRequestDto customerRegisterRequestDto)
     {
         if (!ModelState.IsValid)
         {
@@ -30,7 +29,7 @@ public class AuthApiController : ControllerBase
         try
         {
             // Delegate registration to UserService
-            var token = await _userService.RegisterCustomerAsync(userDto);
+            var token = await _userService.RegisterCustomerAsync(customerRegisterRequestDto);
             return Ok(new { Token = token });
         }
         catch (EmailAlreadyInUseException ex)
@@ -41,6 +40,29 @@ public class AuthApiController : ControllerBase
         catch (Exception)
         {
             // Catch any other exceptions and return a 500 Internal Server Error
+            return StatusCode(500, new { Message = "An error occurred while processing your request." });
+        }
+    }
+    
+    [HttpPost("customers/login")]
+    public async Task<IActionResult> LoginCustomer([FromBody] CustomerLoginRequestDto customerLoginRequestDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var token = await _userService.LoginCustomerAsync(customerLoginRequestDto);
+            return Ok(new { Token = token });
+        }
+        catch (InvalidCredentialsException ex)
+        {
+            return Unauthorized(new { Message = ex.Message });
+        }
+        catch (Exception)
+        {
             return StatusCode(500, new { Message = "An error occurred while processing your request." });
         }
     }

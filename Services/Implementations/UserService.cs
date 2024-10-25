@@ -27,17 +27,17 @@ public class UserService : IUserService
         _mapper = mapper;
     }
 
-    public async Task<string> RegisterCustomerAsync(UserDto userDto)
+    public async Task<string> RegisterCustomerAsync(CustomerRegisterRequestDto customerRegisterRequestDto)
     {
         // Map UserDto to User
-        var user = _mapper.Map<User>(userDto);
+        var user = _mapper.Map<User>(customerRegisterRequestDto);
 
         // Encrypt the email
-        user.Email = _encryptionHelper.Encrypt(userDto.Email);
+        user.Email = _encryptionHelper.Encrypt(customerRegisterRequestDto.Email);
 
         // Hash the password and generate a salt
         string salt;
-        user.Password = HashHelper.HashPassword(userDto.Password, out salt);
+        user.Password = HashHelper.HashPassword(customerRegisterRequestDto.Password, out salt);
         user.SaltKey = salt;
 
         try
@@ -54,6 +54,29 @@ public class UserService : IUserService
                 throw new EmailAlreadyInUseException();
             }
             throw; // Re-throw the original exception if it's not related to email uniqueness
+        }
+
+        // Generate JWT token
+        return _jwtHelper.GenerateToken(user);
+    }
+    
+    public async Task<string> LoginCustomerAsync(CustomerLoginRequestDto customerLoginRequestDto)
+    {
+        // Encrypt the email to match the stored, encrypted version
+        var encryptedEmail = _encryptionHelper.Encrypt(customerLoginRequestDto.Email);
+
+        // Fetch the user by the encrypted email
+        var user = await _userRepository.GetUserByEmailAsync(encryptedEmail);
+
+        if (user == null)
+        {
+            throw new InvalidCredentialsException("Invalid email or password.");
+        }
+
+        // Verify the password
+        if (!HashHelper.VerifyPassword(customerLoginRequestDto.Password, user.Password, user.SaltKey))
+        {
+            throw new InvalidCredentialsException("Invalid email or password.");
         }
 
         // Generate JWT token

@@ -9,7 +9,7 @@ public class UserMapper : Profile
 {
     public UserMapper()
     {
-        CreateMap<UserDto, User>()
+        CreateMap<CustomerRegisterRequestDto, User>()
             .ForMember(dest => dest.Email, opt => opt.Ignore()) // We'll handle encryption separately
             .ForMember(dest => dest.Password, opt => opt.Ignore()) // We'll handle hashing separately
             .ForMember(dest => dest.SaltKey, opt => opt.Ignore()) // Salt generated separately
