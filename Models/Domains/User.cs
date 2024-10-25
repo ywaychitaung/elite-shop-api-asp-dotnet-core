@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace elite_shop.Models.Domains;
 
 using System.ComponentModel.DataAnnotations;
@@ -22,6 +24,10 @@ public class User : UuidBaseModel
     
     public DateTime LastLoginAt { get; set; }
     
-    // Relationships
-    public Role role { get; set; }
+    // Foreign Key for Role
+    [ForeignKey("Role")]
+    public short RoleId { get; set; }
+
+    // Navigation property for Role
+    public Role Role { get; set; }
 }

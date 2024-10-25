@@ -56,6 +56,11 @@ public class ApplicationDbContext : DbContext
                 .Property("UpdatedAt")
                 .HasColumnType("datetime2(7)");
         }
+        
+        // Ensure Email is unique
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
 
         // Call the base OnModelCreating method
         base.OnModelCreating(modelBuilder);

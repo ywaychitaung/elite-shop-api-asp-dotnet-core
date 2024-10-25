@@ -12,8 +12,8 @@ using elite_shop.Data;
 namespace elite_shop.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241024132816_Init")]
-    partial class Init
+    [Migration("20241025065356_AddUniqueConstraintToEmail")]
+    partial class AddUniqueConstraintToEmail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,6 +82,9 @@ namespace elite_shop.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<short>("RoleId")
+                        .HasColumnType("smallint");
+
                     b.Property<string>("SaltKey")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -89,25 +92,30 @@ namespace elite_shop.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2(7)");
 
-                    b.Property<short>("roleId")
-                        .HasColumnType("smallint");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("roleId");
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("RoleId");
 
                     b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("elite_shop.Models.Domains.User", b =>
                 {
-                    b.HasOne("elite_shop.Models.Domains.Role", "role")
-                        .WithMany()
-                        .HasForeignKey("roleId")
+                    b.HasOne("elite_shop.Models.Domains.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("role");
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("elite_shop.Models.Domains.Role", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

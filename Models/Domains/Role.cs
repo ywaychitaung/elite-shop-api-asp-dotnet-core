@@ -11,4 +11,7 @@ public class Role : ShortIntegerBaseModel
     
     [MaxLength(255, ErrorMessage = "Role description must be less than 255 characters")]
     public string Description { get; set; }
+    
+    // Navigation property for Users
+    public ICollection<User> Users { get; set; }
 }

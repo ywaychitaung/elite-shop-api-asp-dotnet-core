@@ -27,7 +27,7 @@ public class JwtHelper
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim("role", user.role?.Name)
+            new Claim("role", user.RoleId.ToString())
         };
 
         var token = new JwtSecurityToken(
