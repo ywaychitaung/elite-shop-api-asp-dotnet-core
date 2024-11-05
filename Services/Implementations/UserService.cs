@@ -68,14 +68,17 @@ public class UserService : IUserService
         // Fetch the user by the encrypted email
         var user = await _userRepository.GetUserByEmailAsync(encryptedEmail);
 
+        // Check if the user exists
         if (user == null)
         {
+            // User not found, throw an exception
             throw new InvalidCredentialsException("Invalid email or password.");
         }
 
         // Verify the password
         if (!HashHelper.VerifyPassword(customerLoginRequestDto.Password, user.Password, user.SaltKey))
         {
+            // Password is incorrect, throw an exception
             throw new InvalidCredentialsException("Invalid email or password.");
         }
 
