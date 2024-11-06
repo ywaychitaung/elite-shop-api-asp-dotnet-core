@@ -26,7 +26,6 @@ builder.Configuration
 // Register RateLimitSettings as a strongly typed configuration
 builder.Services.Configure<RateLimitSetting>(builder.Configuration.GetSection("RateLimitSetting"));
 
-
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
