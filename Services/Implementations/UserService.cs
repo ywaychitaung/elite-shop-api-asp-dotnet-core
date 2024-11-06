@@ -36,9 +36,9 @@ public class UserService : IUserService
         user.Email = _encryptionHelper.Encrypt(customerRegisterRequestDto.Email);
 
         // Hash the password and generate a salt
-        string salt;
-        user.Password = HashHelper.HashPassword(customerRegisterRequestDto.Password, out salt);
-        user.SaltKey = salt;
+        byte[] salt;
+        user.Password = HashHelper.Hash(customerRegisterRequestDto.Password, out salt);
+        user.SaltKey = salt; // Save salt as byte[]
 
         try
         {
@@ -59,29 +59,29 @@ public class UserService : IUserService
         // Generate JWT token
         return _jwtHelper.GenerateToken(user);
     }
-    
+
     public async Task<string> LoginCustomerAsync(CustomerLoginRequestDto customerLoginRequestDto)
     {
         // Encrypt the email to match the stored, encrypted version
         var encryptedEmail = _encryptionHelper.Encrypt(customerLoginRequestDto.Email);
-
+    
         // Fetch the user by the encrypted email
         var user = await _userRepository.GetUserByEmailAsync(encryptedEmail);
-
+    
         // Check if the user exists
         if (user == null)
         {
             // User not found, throw an exception
             throw new InvalidCredentialsException("Invalid email or password.");
         }
-
+    
         // Verify the password
         if (!HashHelper.VerifyPassword(customerLoginRequestDto.Password, user.Password, user.SaltKey))
         {
             // Password is incorrect, throw an exception
             throw new InvalidCredentialsException("Invalid email or password.");
         }
-
+    
         // Generate JWT token
         return _jwtHelper.GenerateToken(user);
     }

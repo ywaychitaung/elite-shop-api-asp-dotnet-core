@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace elite_shop.Migrations
 {
     /// <inheritdoc />
@@ -32,9 +34,9 @@ namespace elite_shop.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    SaltKey = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<byte[]>(type: "varbinary(900)", nullable: false),
+                    Password = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    SaltKey = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     LastLoginAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -52,6 +54,21 @@ namespace elite_shop.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.InsertData(
+                table: "roles",
+                columns: new[] { "Id", "CreatedAt", "Description", "Name", "UpdatedAt" },
+                values: new object[,]
+                {
+                    { (short)1, new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(710), "Customers", "Customer", new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(740) },
+                    { (short)2, new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(740), "Admins", "Admin", new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(740) }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_Email",
+                table: "users",
+                column: "Email",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_RoleId",

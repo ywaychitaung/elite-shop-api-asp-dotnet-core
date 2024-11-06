@@ -16,7 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Set up configuration based on environment
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 
@@ -29,8 +28,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // Register helpers
-builder.Services.AddScoped<JwtHelper>();
 builder.Services.AddScoped<EncryptionHelper>();
+builder.Services.AddScoped<JwtHelper>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -67,9 +66,20 @@ var mapperConfig = new MapperConfiguration(mc =>
 IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+// Load Kestrel settings from appsettings.json for development only
+if (builder.Environment.IsDevelopment())
+{
+    // Load Kestrel settings from appsettings.Development.json
+    var kestrelConfig = builder.Configuration.GetSection("Kestrel:Endpoints:Http:Url").Value;
+    if (!string.IsNullOrEmpty(kestrelConfig))
+    {
+        builder.WebHost.UseUrls(kestrelConfig);
+    }
+}
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline for development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

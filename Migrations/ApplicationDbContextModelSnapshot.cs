@@ -49,6 +49,24 @@ namespace elite_shop.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("roles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = (short)1,
+                            CreatedAt = new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(710),
+                            Description = "Customers",
+                            Name = "Customer",
+                            UpdatedAt = new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(740)
+                        },
+                        new
+                        {
+                            Id = (short)2,
+                            CreatedAt = new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(740),
+                            Description = "Admins",
+                            Name = "Admin",
+                            UpdatedAt = new DateTime(2024, 11, 6, 4, 37, 14, 687, DateTimeKind.Local).AddTicks(740)
+                        });
                 });
 
             modelBuilder.Entity("elite_shop.Models.Domains.User", b =>
@@ -60,10 +78,9 @@ namespace elite_shop.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2(7)");
 
-                    b.Property<string>("Email")
+                    b.Property<byte[]>("Email")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varbinary(900)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -74,17 +91,16 @@ namespace elite_shop.Migrations
                     b.Property<DateTime>("LastLoginAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("Password")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<short>("RoleId")
                         .HasColumnType("smallint");
 
-                    b.Property<string>("SaltKey")
+                    b.Property<byte[]>("SaltKey")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2(7)");

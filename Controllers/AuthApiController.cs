@@ -2,9 +2,9 @@ namespace elite_shop.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using elite_shop.Exceptions;
-using elite_shop.Models.DTOs.Requests;
-using elite_shop.Services.Interfaces;
+using Exceptions;
+using Models.DTOs.Requests;
+using Services.Interfaces;
 using System;
 
 [ApiController]
@@ -35,7 +35,7 @@ public class AuthApiController : ControllerBase
         catch (EmailAlreadyInUseException ex)
         {
             // Return a 409 Conflict for email uniqueness violations
-            return Conflict(new { Message = ex.Message });
+            return Conflict(new { ex.Message });
         }
         catch (Exception)
         {

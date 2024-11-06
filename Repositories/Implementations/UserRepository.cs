@@ -1,17 +1,21 @@
+using elite_shop.Helpers;
+
 namespace elite_shop.Repositories.Implementations;
 
-using elite_shop.Data;
-using elite_shop.Models.Domains;
-using elite_shop.Repositories.Interfaces;
+using Data;
+using Models.Domains;
+using Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 public class UserRepository : IUserRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly EncryptionHelper _encryptionHelper;
 
-    public UserRepository(ApplicationDbContext context)
+    public UserRepository(ApplicationDbContext context, EncryptionHelper encryptionHelper)
     {
         _context = context;
+        _encryptionHelper = encryptionHelper;
     }
 
     // Add a user to the database
@@ -25,9 +29,9 @@ public class UserRepository : IUserRepository
     }
 
     // Get a user by email
-    public async Task<User?> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(byte[] encryptedEmail)
     {
-        // Use FirstOrDefaultAsync to get the first user with the specified email
-        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        // Query for the user with the encrypted email
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == encryptedEmail);
     }
 }

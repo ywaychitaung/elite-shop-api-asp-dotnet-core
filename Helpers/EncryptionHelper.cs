@@ -3,7 +3,6 @@ namespace elite_shop.Helpers;
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 using Microsoft.Extensions.Configuration;
 
 public class EncryptionHelper
@@ -19,9 +18,7 @@ public class EncryptionHelper
         
         // Check that the decoded key is 32 bytes long for AES-256
         if (_encryptionKey.Length != 32)
-        {
             throw new ArgumentException("Encryption key must be 32 bytes long for AES-256.");
-        }
 
         // Fetch the IV from configuration and decode it from Base64
         var base64IV = configuration["AesSettings:IV"];
@@ -29,12 +26,10 @@ public class EncryptionHelper
 
         // Check that the IV is 16 bytes long for AES
         if (_iv.Length != 16)
-        {
             throw new ArgumentException("IV must be 16 bytes long for AES.");
-        }
     }
 
-    public string Encrypt(string plainText)
+    public byte[] Encrypt(string plainText)
     {
         using (var aes = Aes.Create())
         {
@@ -52,22 +47,20 @@ public class EncryptionHelper
                 }
 
                 // Return the encrypted data as a base64-encoded string
-                return Convert.ToBase64String(ms.ToArray());
+                return ms.ToArray();
             }
         }
     }
 
-    public string Decrypt(string cipherText)
+    public string Decrypt(byte[] cipherText)
     {
-        var fullCipher = Convert.FromBase64String(cipherText);
-        
         using (var aes = Aes.Create())
         {
             aes.Key = _encryptionKey;
             aes.IV = _iv;  // Use the same fixed IV for decryption
 
             using (var decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
-            using (var ms = new MemoryStream(fullCipher))
+            using (var ms = new MemoryStream(cipherText))
             using (var cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
             using (var sr = new StreamReader(cs))
             {

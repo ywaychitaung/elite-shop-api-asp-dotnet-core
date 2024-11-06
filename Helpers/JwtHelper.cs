@@ -12,10 +12,12 @@ using elite_shop.Models.Domains;
 public class JwtHelper
 {
     private readonly IConfiguration _configuration;
+    private readonly EncryptionHelper _encryptionHelper;
 
-    public JwtHelper(IConfiguration configuration)
+    public JwtHelper(IConfiguration configuration, EncryptionHelper encryptionHelper)
     {
         _configuration = configuration;
+        _encryptionHelper = encryptionHelper;
     }
 
     public string GenerateToken(User user)
@@ -24,9 +26,12 @@ public class JwtHelper
         var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]));
         var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
+        // Decrypt the user's email to a string
+        var decryptedEmail = _encryptionHelper.Decrypt(user.Email);
+
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+            new Claim(JwtRegisteredClaimNames.Sub, decryptedEmail), // Use decrypted email
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim("role", user.RoleId.ToString())
         };
@@ -41,7 +46,7 @@ public class JwtHelper
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-    
+
     public string GenerateRefreshToken()
     {
         var randomNumber = new byte[32];

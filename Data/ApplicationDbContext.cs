@@ -1,8 +1,9 @@
 namespace elite_shop.Data;
 
 using Microsoft.EntityFrameworkCore;
-using elite_shop.Models.BaseModels;
-using elite_shop.Models.Domains;
+using Models.BaseModels;
+using Models.Domains;
+using Seeders;
 
 public class ApplicationDbContext : DbContext
 {
@@ -64,6 +65,9 @@ public class ApplicationDbContext : DbContext
 
         // Call the base OnModelCreating method
         base.OnModelCreating(modelBuilder);
+        
+        // Call ApplicationDbSeeder to seed all data
+        ApplicationDbSeeder.SeedAll(modelBuilder);
     }
 
     // Automatically update the timestamps when saving changes    
