@@ -1,4 +1,4 @@
-namespace elite_shop.Services.Interfaces;
+namespace elite_shop.Services.ModelServices.Interfaces;
 
 using elite_shop.Models.DTOs.Requests;
 

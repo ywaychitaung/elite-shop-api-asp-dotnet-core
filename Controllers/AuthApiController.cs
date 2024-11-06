@@ -1,10 +1,13 @@
+using elite_shop.Services.UtilityServices.Implementations;
+using elite_shop.Services.UtilityServices.Interfaces;
+
 namespace elite_shop.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Exceptions;
 using Models.DTOs.Requests;
-using Services.Interfaces;
+using Services.ModelServices.Interfaces;
 using System;
 
 [ApiController]
@@ -12,10 +15,12 @@ using System;
 public class AuthApiController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ILoginRateLimitService _loginRateLimitService;
 
-    public AuthApiController(IUserService userService)
+    public AuthApiController(IUserService userService, ILoginRateLimitService loginRateLimitService)
     {
         _userService = userService;
+        _loginRateLimitService = loginRateLimitService;
     }
 
     [HttpPost("customers/register")]
@@ -54,11 +59,24 @@ public class AuthApiController : ControllerBase
 
         try
         {
+            // Check if the user is locked out due to too many failed attempts
+            if (await _loginRateLimitService.IsLockedOutAsync(customerLoginRequestDto.Email))
+            {
+                return BadRequest(new { Message = "Too many failed attempts. Please try again later." });
+            }
+
+            // Attempt to log in the user
             var token = await _userService.LoginCustomerAsync(customerLoginRequestDto);
+
+            // Reset the failed attempt count on successful login
+            await _loginRateLimitService.ResetAttemptsAsync(customerLoginRequestDto.Email);
+
             return Ok(new { Token = token });
         }
         catch (InvalidCredentialsException ex)
         {
+            // Record the failed attempt if the login is unsuccessful
+            await _loginRateLimitService.RecordFailedAttemptAsync(customerLoginRequestDto.Email);
             return Unauthorized(new { Message = ex.Message });
         }
         catch (Exception)

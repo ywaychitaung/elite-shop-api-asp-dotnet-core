@@ -3,13 +3,17 @@ using AutoMapper;
 using elite_shop.Data;
 using elite_shop.Helpers;
 using elite_shop.Mapper;
+using elite_shop.Models.Settings;
 using elite_shop.Repositories.Implementations;
 using elite_shop.Repositories.Interfaces;
-using elite_shop.Services.Implementations;
-using elite_shop.Services.Interfaces;
+using elite_shop.Services.ModelServices.Implementations;
+using elite_shop.Services.ModelServices.Interfaces;
+using elite_shop.Services.UtilityServices.Implementations;
+using elite_shop.Services.UtilityServices.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +23,25 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 
+// Register RateLimitSettings as a strongly typed configuration
+builder.Services.Configure<RateLimitSetting>(builder.Configuration.GetSection("RateLimitSetting"));
+
+
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationDatabase")));
 
+// Register Redis as a singleton service
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = ConfigurationOptions.Parse("localhost:6379", true);
+    return ConnectionMultiplexer.Connect(configuration);
+});
+
 // Register services and repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILoginRateLimitService, LoginRateLimitService>();
 
 // Register helpers
 builder.Services.AddScoped<EncryptionHelper>();

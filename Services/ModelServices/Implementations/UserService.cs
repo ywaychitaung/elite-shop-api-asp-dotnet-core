@@ -1,7 +1,7 @@
+namespace elite_shop.Services.ModelServices.Implementations;
+
 using elite_shop.Exceptions;
 using Microsoft.Data.SqlClient;
-
-namespace elite_shop.Services.Implementations;
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +10,7 @@ using elite_shop.Helpers;
 using elite_shop.Models.Domains;
 using elite_shop.Models.DTOs.Requests;
 using elite_shop.Repositories.Interfaces;
-using elite_shop.Services.Interfaces;
+using elite_shop.Services.ModelServices.Interfaces;
 
 public class UserService : IUserService
 {
